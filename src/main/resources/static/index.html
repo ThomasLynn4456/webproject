@@ -1,35 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>ESP32 Control Panel</title>
     <style>
-        body { font-family: Arial; text-align: center; padding: 20px; }
-        button { padding: 15px 30px; margin: 10px; font-size: 18px; }
-        .alert { color: red; font-weight: bold; font-size: 24px; }
+        body {
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: #fff;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #00e5ff;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px auto;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+        }
+
+        button {
+            padding: 15px 30px;
+            margin: 12px;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: #00e5ff;
+            color: #141e30;
+            font-weight: bold;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.08);
+            background: #1de9b6;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-size: 18px;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #1de9b6;
+        }
+
+        .alert {
+            margin-top: 20px;
+            color: #ff5252;
+            font-weight: bold;
+            font-size: 22px;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); opacity: 1; }
+            to { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* Make responsive */
+        @media (max-width: 500px) {
+            h1 { font-size: 22px; }
+            button { width: 90%; font-size: 16px; }
+        }
     </style>
 </head>
 <body>
-<h1>ESP32 LED & Ultrasonic Control</h1>
-<button onclick="controlLed('on')">Turn LED ON</button>
-<button onclick="controlLed('off')">Turn LED OFF</button>
-<p>LED Status: <span id="ledStatus">Loading...</span></p>
-<p>Distance: <span id="distance">0</span> cm</p>
-<p id="alert"></p>
+<h1>ESP32 Control Panel</h1>
+
+<div class="card">
+    <h2>LED Control</h2>
+    <button onclick="controlLed('on')">💡 Turn ON</button>
+    <button onclick="controlLed('off')">💡 Turn OFF</button>
+    <p class="status">LED Status: <span id="ledStatus" class="highlight">Loading...</span></p>
+</div>
+
+<div class="card">
+    <h2>Ultrasonic Sensor</h2>
+    <p class="status">Distance: <span id="distance" class="highlight">0</span> cm</p>
+    <p id="alert"></p>
+</div>
 
 <script>
     async function fetchStatus() {
-        let res = await fetch('/api/led');
-        let led = await res.text();
-        document.getElementById("ledStatus").innerText = led;
+        try {
+            let res = await fetch('/api/led');
+            let led = await res.text();
+            document.getElementById("ledStatus").innerText = led;
 
-        res = await fetch('/api/distance');
-        let dist = await res.json();
-        document.getElementById("distance").innerText = dist;
+            res = await fetch('/api/distance');
+            let dist = await res.json();
+            document.getElementById("distance").innerText = dist;
 
-        if(dist < 10) {
-            document.getElementById("alert").innerHTML = "<span class='alert'>⚠ ALERT! Object within 10 cm ⚠</span>";
-        } else {
-            document.getElementById("alert").innerText = "";
+            if (dist < 10) {
+                document.getElementById("alert").innerHTML =
+                    "<span class='alert'>⚠ ALERT! Object within 10 cm ⚠</span>";
+            } else {
+                document.getElementById("alert").innerText = "";
+            }
+        } catch (e) {
+            document.getElementById("alert").innerHTML =
+                "<span class='alert'>⚠ Connection Error ⚠</span>";
         }
     }
 
