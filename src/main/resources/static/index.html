@@ -1,134 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>ESP32 Control Panel</title>
-    <style>
-        body {
-            font-family: "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #141e30, #243b55);
-            color: #fff;
-            text-align: center;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+  <meta charset="UTF-8">
+  <title>ESP32 Control Panel</title>
+  <style>
+    /* === Global Styles === */
+    body {
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      text-align: center;
+      overflow-x: hidden;
+      
+      /* Animated Gradient Background */
+      background: linear-gradient(270deg, #141e30, #243b55, #1a237e, #00695c);
+      background-size: 800% 800%;
+      animation: gradientShift 15s ease infinite;
+    }
 
-        h1 {
-            font-size: 26px;
-            margin-bottom: 20px;
-            color: #00e5ff;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-        }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 25px;
-            margin: 15px auto;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            backdrop-filter: blur(8px);
-        }
+    /* === Title === */
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #00e5ff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+      letter-spacing: 1px;
+    }
 
-        button {
-            padding: 15px 30px;
-            margin: 12px;
-            font-size: 18px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            background: #00e5ff;
-            color: #141e30;
-            font-weight: bold;
-            transition: transform 0.2s, background 0.3s;
-        }
+    /* === Card Styling === */
+    .card {
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 20px;
+      padding: 25px;
+      margin: 15px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
 
-        button:hover {
-            transform: scale(1.08);
-            background: #1de9b6;
-        }
+    /* === Buttons === */
+    button {
+      padding: 14px 28px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #00e5ff, #1de9b6);
+      color: #141e30;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+    button:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 16px rgba(0, 229, 255, 0.4);
+    }
 
-        .status {
-            margin-top: 15px;
-            font-size: 18px;
-        }
+    /* === Status text === */
+    .status {
+      margin-top: 15px;
+      font-size: 18px;
+    }
 
-        .highlight {
-            font-weight: bold;
-            color: #1de9b6;
-        }
+    .highlight {
+      font-weight: bold;
+      color: #1de9b6;
+    }
 
-        .alert {
-            margin-top: 20px;
-            color: #ff5252;
-            font-weight: bold;
-            font-size: 22px;
-            animation: pulse 1s infinite alternate;
-        }
+    .alert {
+      margin-top: 18px;
+      color: #ff5252;
+      font-weight: bold;
+      font-size: 22px;
+      animation: pulse 1s infinite alternate;
+    }
 
-        @keyframes pulse {
-            from { transform: scale(1); opacity: 1; }
-            to { transform: scale(1.1); opacity: 0.8; }
-        }
+    @keyframes pulse {
+      from { transform: scale(1); opacity: 1; }
+      to { transform: scale(1.08); opacity: 0.85; }
+    }
 
-        /* Make responsive */
-        @media (max-width: 500px) {
-            h1 { font-size: 22px; }
-            button { width: 90%; font-size: 16px; }
-        }
-    </style>
+    /* === Responsive Design === */
+    @media (max-width: 500px) {
+      h1 { font-size: 22px; }
+      button { width: 100%; font-size: 16px; }
+      .card { padding: 20px; }
+    }
+  </style>
 </head>
 <body>
-<h1>ESP32 Control Panel</h1>
+  <h1>ESP32 Control Panel</h1>
 
-<div class="card">
-    <h2>LED Control</h2>
-    <button onclick="controlLed('on')">💡 Turn ON</button>
-    <button onclick="controlLed('off')">💡 Turn OFF</button>
-    <p class="status">LED Status: <span id="ledStatus" class="highlight">Loading...</span></p>
-</div>
+  <div class="card">
+    <h2>DoorLock System</h2>
+    <button onclick="controlLed('on')">🔓 Open</button>
+    <button onclick="controlLed('off')">🔒 Close</button>
+    <p class="status">Lock Status: <span id="ledStatus" class="highlight">Loading...</span></p>
+  </div>
 
-<div class="card">
-    <h2>Ultrasonic Sensor</h2>
+  <div class="card">
+    <h2>ALARM</h2>
     <p class="status">Distance: <span id="distance" class="highlight">0</span> cm</p>
     <p id="alert"></p>
-</div>
+  </div>
 
-<script>
+  <script>
     async function fetchStatus() {
-        try {
-            let res = await fetch('/api/led');
-            let led = await res.text();
-            document.getElementById("ledStatus").innerText = led;
+      try {
+        let res = await fetch('/api/led');
+        let led = await res.text();
+        document.getElementById("ledStatus").innerText = led;
 
-            res = await fetch('/api/distance');
-            let dist = await res.json();
-            document.getElementById("distance").innerText = dist;
+        res = await fetch('/api/distance');
+        let dist = await res.json();
+        document.getElementById("distance").innerText = dist;
 
-            if (dist < 10) {
-                document.getElementById("alert").innerHTML =
-                    "<span class='alert'>⚠ ALERT! Object within 10 cm ⚠</span>";
-            } else {
-                document.getElementById("alert").innerText = "";
-            }
-        } catch (e) {
-            document.getElementById("alert").innerHTML =
-                "<span class='alert'>⚠ Connection Error ⚠</span>";
+        if (dist < 10) {
+          document.getElementById("alert").innerHTML =
+            "<span class='alert'>⚠ ALERT! Object Detected ⚠</span>";
+        } else {
+          document.getElementById("alert").innerText = "";
         }
+      } catch (e) {
+        document.getElementById("alert").innerHTML =
+          "<span class='alert'>⚠ Connection Error ⚠</span>";
+      }
     }
 
     async function controlLed(action) {
-        await fetch('/api/led/' + action, { method: 'POST' });
-        fetchStatus();
+      await fetch('/api/led/' + action, { method: 'POST' });
+      fetchStatus();
     }
 
-    setInterval(fetchStatus, 2000); // Refresh every 2s
+    setInterval(fetchStatus, 2000);
     fetchStatus();
-</script>
+  </script>
 </body>
 </html>
