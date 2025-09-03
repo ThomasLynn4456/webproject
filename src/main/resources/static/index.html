@@ -1,156 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>ESP32 Control Panel</title>
-  <style>
-    /* === Global Styles === */
-    body {
-      font-family: "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: #fff;
-      text-align: center;
-      overflow-x: hidden;
-      
-      /* Animated Gradient Background */
-      background: linear-gradient(270deg, #141e30, #243b55, #1a237e, #00695c);
-      background-size: 800% 800%;
-      animation: gradientShift 15s ease infinite;
-    }
+    <meta charset="UTF-8">
+    <title>ESP32 Control Panel</title>
+    <style>
+        /* === Global Styles === */
+        body {
+            font-family: "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            overflow-x: hidden;
 
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+            /* Animated Gradient Background */
+            background: linear-gradient(270deg, #141e30, #243b55, #1a237e, #00695c);
+            background-size: 800% 800%;
+            animation: gradientShift 15s ease infinite;
+        }
 
-    /* === Title === */
-    h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
-      color: #00e5ff;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-      letter-spacing: 1px;
-    }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-    /* === Card Styling === */
-    .card {
-      background: rgba(255, 255, 255, 0.07);
-      border-radius: 20px;
-      padding: 25px;
-      margin: 15px;
-      width: 90%;
-      max-width: 420px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(10px);
-      transition: transform 0.3s;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-    }
+        /* === Title === */
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #00e5ff;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            letter-spacing: 1px;
+        }
 
-    /* === Buttons === */
-    button {
-      padding: 14px 28px;
-      margin: 10px;
-      font-size: 18px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #00e5ff, #1de9b6);
-      color: #141e30;
-      font-weight: bold;
-      transition: transform 0.2s, box-shadow 0.3s;
-    }
-    button:hover {
-      transform: scale(1.08);
-      box-shadow: 0 6px 16px rgba(0, 229, 255, 0.4);
-    }
+        /* === Card Styling === */
+        .card {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
 
-    /* === Status text === */
-    .status {
-      margin-top: 15px;
-      font-size: 18px;
-    }
+        /* === Buttons === */
+        button {
+            padding: 14px 28px;
+            margin: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #00e5ff, #1de9b6);
+            color: #141e30;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+        button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 16px rgba(0, 229, 255, 0.4);
+        }
 
-    .highlight {
-      font-weight: bold;
-      color: #1de9b6;
-    }
+        /* === Status text === */
+        .status {
+            margin-top: 15px;
+            font-size: 18px;
+        }
 
-    .alert {
-      margin-top: 18px;
-      color: #ff5252;
-      font-weight: bold;
-      font-size: 22px;
-      animation: pulse 1s infinite alternate;
-    }
+        .highlight {
+            font-weight: bold;
+            color: #1de9b6;
+        }
 
-    @keyframes pulse {
-      from { transform: scale(1); opacity: 1; }
-      to { transform: scale(1.08); opacity: 0.85; }
-    }
+        .alert {
+            margin-top: 18px;
+            color: #ff5252;
+            font-weight: bold;
+            font-size: 22px;
+            animation: pulse 1s infinite alternate;
+        }
 
-    /* === Responsive Design === */
-    @media (max-width: 500px) {
-      h1 { font-size: 22px; }
-      button { width: 100%; font-size: 16px; }
-      .card { padding: 20px; }
-    }
-  </style>
+        @keyframes pulse {
+            from { transform: scale(1); opacity: 1; }
+            to { transform: scale(1.08); opacity: 0.85; }
+        }
+
+        /* === Responsive Design === */
+        @media (max-width: 500px) {
+            h1 { font-size: 22px; }
+            button { width: 100%; font-size: 16px; }
+            .card { padding: 20px; }
+        }
+    </style>
 </head>
 <body>
-  <h1>ESP32 Control Panel</h1>
+<h1>ESP32 Control Panel</h1>
 
-  <div class="card">
+<div class="card">
     <h2>DoorLock System</h2>
     <button onclick="controlLed('on')">🔓 Open</button>
     <button onclick="controlLed('off')">🔒 Close</button>
     <p class="status">Lock Status: <span id="ledStatus" class="highlight">Loading...</span></p>
-  </div>
+</div>
 
-  <div class="card">
+<div class="card">
     <h2>ALARM</h2>
     <p class="status">Distance: <span id="distance" class="highlight">0</span> cm</p>
     <p id="alert"></p>
-  </div>
+</div>
 
-  <script>
+<div class="card">
+    <h2>Motion Sensor</h2>
+    <p id="motionStatus" class="status">Motion: <span class="highlight">Loading...</span></p>
+</div>
+
+<script>
     async function fetchStatus() {
-      try {
-        let res = await fetch('/api/led');
-        let led = await res.text();
-        document.getElementById("ledStatus").innerText = led;
+        try {
+            // --- LED status ---
+            let res = await fetch('/api/led');
+            let led = await res.text();
+            document.getElementById("ledStatus").innerText = led;
 
-        res = await fetch('/api/distance');
-        let dist = await res.json();
-        document.getElementById("distance").innerText = dist;
+            // --- Distance ---
+            res = await fetch('/api/distance');
+            let dist = await res.json();
+            document.getElementById("distance").innerText = dist;
 
-        if (dist < 10) {
-          document.getElementById("alert").innerHTML =
-            "<span class='alert'>⚠ ALERT! Object Detected ⚠</span>";
-        } else {
-          document.getElementById("alert").innerText = "";
+            if (dist < 10) {
+                document.getElementById("alert").innerHTML =
+                    "<span class='alert'>⚠ ALERT! Object Detected ⚠</span>";
+            } else {
+                document.getElementById("alert").innerText = "";
+            }
+
+            // --- Motion ---
+            res = await fetch('/api/motion');
+            let motion = await res.json();
+            document.getElementById("motionStatus").innerHTML =
+                motion
+                    ? "<span class='alert'>⚠ Motion Detected ⚠</span>"
+                    : "Motion: <span class='highlight'>No Motion</span>";
+        } catch (e) {
+            document.getElementById("alert").innerHTML =
+                "<span class='alert'>⚠ Connection Error ⚠</span>";
         }
-      } catch (e) {
-        document.getElementById("alert").innerHTML =
-          "<span class='alert'>⚠ Connection Error ⚠</span>";
-      }
     }
 
     async function controlLed(action) {
-      await fetch('/api/led/' + action, { method: 'POST' });
-      fetchStatus();
+        await fetch('/api/led/' + action, { method: 'POST' });
+        fetchStatus();
     }
 
     setInterval(fetchStatus, 2000);
     fetchStatus();
-  </script>
+</script>
 </body>
 </html>
