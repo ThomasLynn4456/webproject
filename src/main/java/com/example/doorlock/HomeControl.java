@@ -1,6 +1,5 @@
 package com.example.doorlock;
 
-
 import org.springframework.web.bind.annotation.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -11,6 +10,7 @@ public class HomeControl {
 
     private final AtomicBoolean ledOn = new AtomicBoolean(false);
     private final AtomicReference<Double> distance = new AtomicReference<>(0.0);
+    private final AtomicBoolean motionDetected = new AtomicBoolean(false); // NEW
 
     // ESP32 sends ultrasonic distance here
     @PostMapping("/sensor")
@@ -44,11 +44,30 @@ public class HomeControl {
         ledOn.set(false);
         return "LED is OFF";
     }
+
+    // --- Motion API ---
+    @PostMapping("/motion")
+    public String updateMotion(@RequestBody MotionData data) {
+        motionDetected.set(data.isMotion());
+        return "Motion updated: " + data.isMotion();
+    }
+
+    @GetMapping("/motion")
+    public boolean getMotion() {
+        return motionDetected.get();
+    }
 }
 
-// Helper class for JSON mapping
+// Helper class for distance
 class SensorData {
     private double distance;
     public double getDistance() { return distance; }
     public void setDistance(double distance) { this.distance = distance; }
+}
+
+// Helper class for motion
+class MotionData {
+    private boolean motion;
+    public boolean isMotion() { return motion; }
+    public void setMotion(boolean motion) { this.motion = motion; }
 }
