@@ -123,7 +123,7 @@
 
 <div class="card">
     <h2>Motion Sensor</h2>
-    <p id="motionStatus" class="status">Motion: <span class="highlight">Loading...</span></p>
+    <p class="status">Motion: <span id="motionStatus" class="highlight">Loading...</span></p>
 </div>
 
 <script>
@@ -152,7 +152,7 @@
             document.getElementById("motionStatus").innerHTML =
                 motion
                     ? "<span class='alert'>⚠ Motion Detected ⚠</span>"
-                    : "Motion: <span class='highlight'>No Motion</span>";
+                    : "<span class='highlight'>No Motion</span>";
         } catch (e) {
             document.getElementById("alert").innerHTML =
                 "<span class='alert'>⚠ Connection Error ⚠</span>";
