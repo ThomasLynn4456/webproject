@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ESP32 Control Panel</title>
+    <title>My Doorlock</title>
     <style>
         /* === Global Styles === */
         body {
@@ -14,12 +14,12 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: #fff;
+            color: #75543c;
             text-align: center;
             overflow-x: hidden;
 
             /* Animated Gradient Background */
-            background: linear-gradient(270deg, #141e30, #243b55, #1a237e, #00695c);
+            background: linear-gradient(271deg, #9c7a6c, #d1a888, #8c7a6c, #d1a888);
             background-size: 800% 800%;
             animation: gradientShift 15s ease infinite;
         }
@@ -32,27 +32,33 @@
 
         /* === Title === */
         h1 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            color: #00e5ff;
+            font-size: 32px;
+            margin: 20px;
+            color: #f4f4f4;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
             letter-spacing: 1px;
+            text-align: center;
+        }
+
+        h2 {
+            text-transform: uppercase;
+            margin-bottom: 15px;
         }
 
         /* === Card Styling === */
         .card {
-            background: rgba(255, 255, 255, 0.07);
-            border-radius: 20px;
+            background: #f4f4f4;
             padding: 25px;
             margin: 15px;
             width: 90%;
-            max-width: 420px;
+            max-width: 480px;
+            border: 8px solid #75543c;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s;
+            border-radius: 12px;
+            transition: transform 0.3s linear;
         }
         .card:hover {
-            transform: translateY(-5px);
+            transform: scale(1.03);
         }
 
         /* === Buttons === */
@@ -63,19 +69,26 @@
             border: none;
             border-radius: 12px;
             cursor: pointer;
-            background: linear-gradient(135deg, #00e5ff, #1de9b6);
-            color: #141e30;
+            background: #6b472f;
+            color: #f4f4f4;
+            text-transform: uppercase;
             font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.3s;
+            transition: all 0.2s, box-shadow 0.3s;
         }
         button:hover {
             transform: scale(1.08);
-            box-shadow: 0 6px 16px rgba(0, 229, 255, 0.4);
+            box-shadow: 0 6px 16px #6b472f;
+            color: #6b472f;
+            background-color: #f4f4f4;
+        }
+
+        button:active {
+            translate: 5px;
         }
 
         /* === Status text === */
         .status {
-            margin-top: 15px;
+            margin-top: 10px;
             font-size: 18px;
         }
 
@@ -85,10 +98,10 @@
         }
 
         .alert {
-            margin-top: 18px;
+            margin-top: 15px;
             color: #ff5252;
             font-weight: bold;
-            font-size: 22px;
+            font-size: 20px;
             animation: pulse 1s infinite alternate;
         }
 
@@ -98,33 +111,35 @@
         }
 
         /* === Responsive Design === */
-        @media (max-width: 500px) {
-            h1 { font-size: 22px; }
-            button { width: 100%; font-size: 16px; }
-            .card { padding: 20px; }
+        @media (max-width: 600px) {
+            h1 { font-size: 22px; margin: 15px; }
+            button { width: 100%; font-size: 16px; margin: 8px 0; }
+            .card { padding: 18px; margin: 10px; }
         }
     </style>
 </head>
 <body>
-<h1>ESP32 Control Panel</h1>
+    <h1>Smarter Lock: Safer Home</h1>
 
-<div class="card">
-    <h2>DoorLock System</h2>
-    <button onclick="controlLed('on')">🔓 Open</button>
-    <button onclick="controlLed('off')">🔒 Close</button>
-    <p class="status">Lock Status: <span id="ledStatus" class="highlight">Loading...</span></p>
-</div>
+    <!-- Card 1: LED + Motion -->
+    <div class="card">
+        <h2>Door Lock & Motion</h2>
 
-<div class="card">
-    <h2>ALARM</h2>
-    <p class="status">Distance: <span id="distance" class="highlight">0</span> cm</p>
-    <p id="alert"></p>
-</div>
+        <!-- Door Lock -->
+        <button onclick="controlLed('on')">🔓 Open</button>
+        <button onclick="controlLed('off')">🔒 Close</button>
+        <p class="status">Lock Status: <span id="ledStatus" class="highlight">Loading...</span></p>
 
-<div class="card">
-    <h2>Motion Sensor</h2>
-    <p class="status">Motion: <span id="motionStatus" class="highlight">Loading...</span></p>
-</div>
+        <!-- Motion -->
+        <p id="motionStatus" class="status">Motion: <span class="highlight">Loading...</span></p>
+    </div>
+
+    <!-- Card 2: Alarm -->
+    <div class="card">
+        <h2>Alarm</h2>
+        <p class="status">Distance: <span id="distance" class="highlight">0</span> cm</p>
+        <p id="alert"></p>
+    </div>
 
 <script>
     async function fetchStatus() {
@@ -134,28 +149,28 @@
             let led = await res.text();
             document.getElementById("ledStatus").innerText = led;
 
-            // --- Distance ---
-            res = await fetch('/api/distance');
-            let dist = await res.json();
-            document.getElementById("distance").innerText = dist;
-
-            if (dist < 10) {
-                document.getElementById("alert").innerHTML =
-                    "<span class='alert'>⚠ ALERT! Object Detected ⚠</span>";
-            } else {
-                document.getElementById("alert").innerText = "";
-            }
-
             // --- Motion ---
             res = await fetch('/api/motion');
             let motion = await res.json();
             document.getElementById("motionStatus").innerHTML =
                 motion
                     ? "<span class='alert'>⚠ Motion Detected ⚠</span>"
-                    : "<span class='highlight'>No Motion</span>";
+                    : "Motion: <span class='highlight'>No Motion</span>";
+
+            // --- Distance / Alarm ---
+            res = await fetch('/api/distance');
+            let dist = await res.json();
+            document.getElementById("distance").innerText = dist;
+
+            if (dist < 10) {
+                document.getElementById("alert").innerHTML =
+                    "<span class='alert'>ALERT! Object Detected</span>";
+            } else {
+                document.getElementById("alert").innerText = "";
+            }
         } catch (e) {
             document.getElementById("alert").innerHTML =
-                "<span class='alert'>⚠ Connection Error ⚠</span>";
+                "<span class='alert'>Connection Error</span>";
         }
     }
 
